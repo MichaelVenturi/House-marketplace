@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { db } from "../firebase.config";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { setDoc, doc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../firebase.config";
 import ArrowRightIcon from "../assets/svg/keyboardArrowRightIcon.svg?react";
 import visibilityIcon from "../assets/svg/visibilityIcon.svg";
+
+import { IFirebaseUser } from "../shared/firebaseTypes";
 
 interface ISignUpFormData {
   name: string;
@@ -28,8 +31,6 @@ const SignUp = () => {
     e.preventDefault();
     try {
       //console.log(db);
-      const auth = getAuth();
-
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
       const user = userCredential.user;
@@ -37,6 +38,10 @@ const SignUp = () => {
       updateProfile(auth.currentUser!, {
         displayName: name,
       });
+
+      const formDataCopy: IFirebaseUser = { email, name, timestamp: serverTimestamp() };
+
+      await setDoc(doc(db, "users", user.uid), formDataCopy);
       navigate("/");
     } catch (err) {
       console.log(err);
