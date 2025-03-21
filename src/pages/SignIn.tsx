@@ -5,6 +5,7 @@ import ArrowRightIcon from "../assets/svg/keyboardArrowRightIcon.svg?react";
 import visibilityIcon from "../assets/svg/visibilityIcon.svg";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase.config";
+import { FirebaseError } from "firebase/app";
 
 interface ISignInFormData {
   email: string;
@@ -34,8 +35,13 @@ const SignIn = () => {
         navigate("/");
       }
     } catch (err: unknown) {
+      let errText = "Something went wrong signing in";
+      if (err instanceof FirebaseError) {
+        errText = err.code === "auth/invalid-credential" ? "Your email or password is incorrect" : errText;
+      }
       console.log(err);
-      toast.error("Bad user credentials");
+
+      toast.error(errText);
     }
   };
 

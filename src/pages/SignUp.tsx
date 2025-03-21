@@ -6,6 +6,7 @@ import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebase.config";
 import ArrowRightIcon from "../assets/svg/keyboardArrowRightIcon.svg?react";
 import visibilityIcon from "../assets/svg/visibilityIcon.svg";
+import { FirebaseError } from "firebase/app";
 
 import { IFirebaseUser } from "../shared/firebaseTypes";
 
@@ -44,9 +45,24 @@ const SignUp = () => {
 
       await setDoc(doc(db, "users", user.uid), formDataCopy);
       navigate("/");
-    } catch (err) {
+    } catch (err: unknown) {
+      let errText = "Something went wrong signing up";
+      if (err instanceof FirebaseError) {
+        switch (err.code) {
+          case "auth/weak-password":
+            errText = "Your password must be at least six characters";
+            break;
+          case "auth/email-already-in-use":
+          case "auth/email-already-exists": // firebase docs shows this code instead, idk just check for both
+            errText = "This email is already associated with an account";
+            break;
+          default:
+            break;
+        }
+      }
       console.log(err);
-      toast.error("Something went wrong with registration");
+
+      toast.error(errText);
     }
   };
 
