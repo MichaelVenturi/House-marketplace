@@ -1,13 +1,13 @@
 import { useLocation } from "react-router-dom";
 
 // I wanted to get creative with this component, passing the svg Icon as a prop.  This way the Navbar file is less cluttered
-interface NavbarItemProps {
+interface INavbarItemProps {
   route: string;
   Icon: React.ElementType;
   text: string;
 }
 
-const NavbarItem: React.FC<NavbarItemProps> = ({ route, Icon, text }) => {
+const NavbarItem: React.FC<INavbarItemProps> = ({ route, Icon, text }) => {
   const location = useLocation();
   const pathMatchRoute = (r: string): boolean => {
     if (r == location.pathname) {
