@@ -3,6 +3,7 @@ import { ToastContainer } from "react-toastify";
 import Navbar from "./components/layouts/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import Explore from "./pages/Explore";
+import Category from "./pages/Category";
 import Profile from "./pages/Profile";
 import Offers from "./pages/Offers";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -16,6 +17,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Explore />} />
           <Route path="/offers" element={<Offers />} />
+          <Route path="/category/:categoryName" element={<Category />} />
           <Route element={<PrivateRoute />}>
             <Route path="/profile" element={<Profile />} />
           </Route>

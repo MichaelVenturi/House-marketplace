@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { auth, db } from "../firebase.config";
-import { User, updateProfile } from "firebase/auth";
+import { User, updateProfile, updateEmail } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -50,6 +50,11 @@ const Profile = () => {
         });
         changesMade = true;
       }
+
+      if (user.email !== email) {
+        await updateEmail(user, email);
+      }
+
       if (changesMade) {
         toast.success("Profile details updated");
       }

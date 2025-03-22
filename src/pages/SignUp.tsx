@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { setDoc, doc, serverTimestamp } from "firebase/firestore";
+import { setDoc, doc, serverTimestamp, Timestamp } from "firebase/firestore";
 import { auth, db } from "../firebase.config";
 import ArrowRightIcon from "../assets/svg/keyboardArrowRightIcon.svg?react";
 import visibilityIcon from "../assets/svg/visibilityIcon.svg";
@@ -41,7 +41,7 @@ const SignUp = () => {
         displayName: name,
       });
 
-      const formDataCopy: IFirebaseUser = { email, name, timestamp: serverTimestamp() };
+      const formDataCopy: IFirebaseUser = { email, name, timestamp: serverTimestamp() as Timestamp };
 
       await setDoc(doc(db, "users", user.uid), formDataCopy);
       navigate("/");
