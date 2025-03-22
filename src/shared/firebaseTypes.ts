@@ -25,7 +25,7 @@ export interface IListingSchema {
   furnished: boolean;
   parking: boolean;
   geoLocation: GeoLocation;
-  timestamp: Timestamp;
+  timestamp: Timestamp | null;
   type: ListingType;
   userRef: string;
 }
