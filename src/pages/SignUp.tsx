@@ -7,7 +7,7 @@ import { auth, db } from "../firebase.config";
 import ArrowRightIcon from "../assets/svg/keyboardArrowRightIcon.svg?react";
 import visibilityIcon from "../assets/svg/visibilityIcon.svg";
 import { FirebaseError } from "firebase/app";
-
+import OAuth from "../components/OAuth";
 import { IFirebaseUser } from "../shared/firebaseTypes";
 
 interface ISignUpFormData {
@@ -108,7 +108,7 @@ const SignUp = () => {
           </div>
         </form>
 
-        {/* Google OAuth */}
+        <OAuth />
         <Link to="/sign-in" className="registerLink">
           Sign In Instead
         </Link>

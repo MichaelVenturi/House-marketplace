@@ -6,6 +6,7 @@ import visibilityIcon from "../assets/svg/visibilityIcon.svg";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase.config";
 import { FirebaseError } from "firebase/app";
+import OAuth from "../components/OAuth";
 
 interface ISignInFormData {
   email: string;
@@ -85,7 +86,7 @@ const SignIn = () => {
           </div>
         </form>
 
-        {/* Google OAuth */}
+        <OAuth />
         <Link to="/sign-up" className="registerLink">
           Sign Up Instead
         </Link>
