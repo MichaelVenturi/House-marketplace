@@ -6,7 +6,7 @@ export interface IFirebaseUser {
   timestamp: Timestamp;
 }
 
-type GeoLocation = {
+export type GeoLocation = {
   lat: number;
   lng: number;
 };
