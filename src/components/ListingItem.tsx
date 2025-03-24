@@ -17,7 +17,7 @@ const ListingItem: React.FC<IListingItemProps> = ({ listing, id, onDelete }) => 
   };
   return (
     <li className="categoryListing">
-      <Link to={`/catgeory/${listing.type}/${id}`} className="categoryListingLink">
+      <Link to={`/category/${listing.type}/${id}`} className="categoryListingLink">
         <img src={listing.ImageUrls[0]} alt={listing.name} className="categoryListingImg" />
         <div className="categoryListingDetails">
           <p className="categoryListingLocation">{listing.location}</p>
