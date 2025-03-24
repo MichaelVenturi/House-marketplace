@@ -11,7 +11,7 @@ export type GeoLocation = {
   lng: number;
 };
 
-type ListingType = "rent" | "sale";
+export type ListingType = "rent" | "sale";
 
 export interface IListingSchema {
   name: string;
@@ -24,7 +24,7 @@ export interface IListingSchema {
   bedrooms: number;
   furnished: boolean;
   parking: boolean;
-  geoLocation: GeoLocation;
+  geolocation: GeoLocation;
   timestamp: Timestamp | null;
   type: ListingType;
   userRef: string;

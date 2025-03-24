@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { IListingSchema, GeoLocation } from "../shared/firebaseTypes";
-import { auth } from "../firebase.config";
+import { IListingSchema, GeoLocation, ListingType } from "../shared/firebaseTypes";
+import { auth, db, storage } from "../firebase.config";
 import { onAuthStateChanged } from "firebase/auth";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { addDoc, collection, serverTimestamp, Timestamp } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import { toast } from "react-toastify";
@@ -12,14 +15,14 @@ interface IFormData {
   offer: boolean;
   regularPrice: number;
   discountedPrice: number;
-  images: FileList | null;
+  images?: File[] | null; // optional props are to be deleted before translating into IListingSchema
   bathrooms: number;
   bedrooms: number;
   furnished: boolean;
   parking: boolean;
-  lat: number;
-  lng: number;
-  type: string;
+  lat?: number;
+  lng?: number;
+  type: ListingType;
   userRef: string;
 }
 
@@ -41,6 +44,7 @@ const defaultListingData: IFormData = {
 };
 
 const CreateListing = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [geolocationEnabled, setGeolocationEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<IFormData>(defaultListingData);
@@ -79,9 +83,13 @@ const CreateListing = () => {
 
     // files
     if (target instanceof HTMLInputElement && target.type === "file" && target.files) {
+      const files: File[] = [];
+      for (const [key, value] of Object.entries(target.files)) {
+        if (key !== "length") files.push(value);
+      }
       setFormData((prevState) => ({
         ...prevState,
-        images: target.files!,
+        images: files,
       }));
     }
     // text bools numbers
@@ -107,8 +115,8 @@ const CreateListing = () => {
       return;
     }
 
-    const geolocation: GeoLocation = { lat: formData.lat, lng: formData.lng };
-    let location = formData.location;
+    const geolocation: GeoLocation = { lat: formData.lat!, lng: formData.lng! };
+    const location = formData.location;
     if (geolocationEnabled) {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${formData.location}&key=${
@@ -118,7 +126,6 @@ const CreateListing = () => {
       const data = await response.json();
       geolocation.lat = data.results[0]?.geometry.location.lat ?? 0;
       geolocation.lng = data.results[0]?.geometry.location.lng ?? 0;
-      location = data.status === "ZERO_RESULTS" ? undefined : data.results[0]?.formatted_address;
 
       if (location === undefined || location.includes("undefined")) {
         setLoading(false);
@@ -126,8 +133,70 @@ const CreateListing = () => {
         return;
       }
     }
-    console.log(geolocation);
+
+    // store image
+    const storeImage = async (image: File) => {
+      return new Promise((resolve, reject) => {
+        const filename = `${auth.currentUser!.uid}-${image.name}-${uuidv4()}`;
+        const storageRef = ref(storage, "images/" + filename);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log("Upload is " + progress + "% done");
+            switch (snapshot.state) {
+              case "paused":
+                console.log("Upload is paused");
+                break;
+              case "running":
+                console.log("Upload is running");
+                break;
+              default:
+                break;
+            }
+          },
+          (error) => {
+            reject(error);
+          },
+          () => {
+            // Handle successful uploads on complete
+            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              resolve(downloadURL);
+            });
+          }
+        );
+      });
+    };
+
+    const ImageUrls = await Promise.all([...formData.images].map((image) => storeImage(image))).catch(() => {
+      setLoading(false);
+      toast.error("Images not uploaded");
+    });
+
+    // sloppy typescript thing.  Wish spreading didn't add the props IListingSchema doesnt have
+    // I cant even delete them from the copy since typescript says the copy isnt supposed to have them lmao
+    delete formData.images;
+    delete formData.lat;
+    delete formData.lng;
+
+    const formDataCopy: IListingSchema = {
+      ...formData,
+      ImageUrls: ImageUrls as string[],
+      geolocation,
+      timestamp: serverTimestamp() as Timestamp,
+    };
+
+    if (!formDataCopy.offer) {
+      delete formDataCopy.discountedPrice;
+    }
+    console.log(formDataCopy);
+    const docRef = await addDoc(collection(db, "listings"), formDataCopy);
     setLoading(false);
+    toast.success("Listing saved");
+    navigate(`/category/${formDataCopy.type}/${docRef.id}`);
   };
 
   if (loading) {
