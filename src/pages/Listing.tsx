@@ -84,7 +84,7 @@ const Listing = () => {
         </p>
         <p className="listingLocation">{listing.location}</p>
         <p className="listingType">For {listing.type}</p>
-        {listing.offer && <p className="discountPrice">${listing.regularPrice - listing.discountedPrice!}</p>}
+        {listing.offer && <p className="discountPrice">${listing.regularPrice - listing.discountedPrice!} discount</p>}
 
         <ul className="listingDetailsList">
           <li>{`${listing.bedrooms} Bedroom${listing.bedrooms > 1 ? "s" : ""}`}</li>
