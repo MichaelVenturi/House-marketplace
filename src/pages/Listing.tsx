@@ -4,6 +4,10 @@ import { getDoc, doc } from "firebase/firestore";
 import { auth, db } from "../firebase.config";
 import Spinner from "../components/Spinner";
 import shareIcon from "../assets/svg/shareIcon.svg";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { Navigation, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+
 import { IListingSchema } from "../shared/firebaseTypes";
 
 type ListingParams = {
@@ -45,7 +49,20 @@ const Listing = () => {
   }
   return (
     <main>
-      {/* slider */}
+      <Swiper
+        modules={[Navigation, Pagination]}
+        style={{ height: "300px" }}
+        slidesPerView={1}
+        navigation={true}
+        pagination={true}>
+        {listing.ImageUrls.map((url, i) => (
+          <SwiperSlide key={i}>
+            <div
+              style={{ background: `url(${url}) center no-repeat`, backgroundSize: "cover" }}
+              className="swiperSlideDiv"></div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
 
       <div
         className="shareIconDiv"
@@ -76,7 +93,22 @@ const Listing = () => {
           <li>{listing.furnished && "Furnished"}</li>
         </ul>
         <p className="listingLocationTitle">Location</p>
-        {/* map */}
+
+        <div className="leafletContainer">
+          <MapContainer
+            center={[listing.geolocation.lat, listing.geolocation.lng]}
+            style={{ height: "100%", width: "100%" }}
+            zoom={13}
+            scrollWheelZoom={false}>
+            <TileLayer
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png"
+            />
+            <Marker position={[listing.geolocation.lat, listing.geolocation.lng]}>
+              <Popup>{listing.location}</Popup>
+            </Marker>
+          </MapContainer>
+        </div>
 
         {auth.currentUser?.uid !== listing.userRef && (
           <Link to={`/contact/${listing.userRef}?Listingname=${listing.name}`} className="primaryButton">
