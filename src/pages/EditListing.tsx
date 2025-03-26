@@ -225,7 +225,6 @@ const EditListing = () => {
     if (!formDataCopy.offer) {
       delete formDataCopy.discountedPrice;
     }
-    console.log(formDataCopy);
     const docRef = doc(db, "listings", listingId!);
     await updateDoc(docRef, { ...formDataCopy });
     setLoading(false);
