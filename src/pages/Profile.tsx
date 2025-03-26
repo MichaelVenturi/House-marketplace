@@ -45,7 +45,7 @@ const Profile = () => {
       setLoading(false);
     };
     fetchUserListings();
-  }, [auth.currentUser?.uid]);
+  }, []);
 
   const onLogout = () => {
     auth.signOut();
@@ -87,6 +87,10 @@ const Profile = () => {
       console.log(err);
       toast.error("Could not update profile details");
     }
+  };
+
+  const onEdit = (id: string) => {
+    navigate(`/edit-listing/${id}`);
   };
 
   const onDelete = async (id: string) => {
@@ -156,6 +160,7 @@ const Profile = () => {
                   listing={listing.data}
                   id={listing.id}
                   onDelete={() => onDelete(listing.id)}
+                  onEdit={() => onEdit(listing.id)}
                 />
               ))}
             </ul>

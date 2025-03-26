@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import DeleteIcon from "../assets/svg/deleteIcon.svg?react";
+import EditIcon from "../assets/svg/editIcon.svg?react";
 import bedIcon from "../assets/svg/bedIcon.svg";
 import bathtubIcon from "../assets/svg/bathtubIcon.svg";
 import { IListingSchema } from "../shared/firebaseTypes";
@@ -8,10 +9,11 @@ interface IListingItemProps {
   listing: IListingSchema;
   id: string;
 
-  onDelete?: (id: string, name: string) => void;
+  onDelete?: (id: string) => void;
+  onEdit?: (id: string) => void;
 }
 
-const ListingItem: React.FC<IListingItemProps> = ({ listing, id, onDelete }) => {
+const ListingItem: React.FC<IListingItemProps> = ({ listing, id, onDelete, onEdit }) => {
   const formatPrice = (price: number): string => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
@@ -36,10 +38,8 @@ const ListingItem: React.FC<IListingItemProps> = ({ listing, id, onDelete }) => 
           </div>
         </div>
       </Link>
-
-      {onDelete && (
-        <DeleteIcon className="removeIcon" fill="rgb(231, 76,60)" onClick={() => onDelete(id, listing.name)} />
-      )}
+      {onEdit && <EditIcon className="editIcon" onClick={() => onEdit(id)} />}
+      {onDelete && <DeleteIcon className="removeIcon" fill="rgb(231, 76,60)" onClick={() => onDelete(id)} />}
     </li>
   );
 };

@@ -8,6 +8,7 @@ import Explore from "./pages/Explore";
 import Category from "./pages/Category";
 import Profile from "./pages/Profile";
 import CreateListing from "./pages/CreateListing";
+import EditListing from "./pages/EditListing";
 import Offers from "./pages/Offers";
 import Listing from "./pages/Listing";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -26,6 +27,7 @@ const App = () => {
           <Route element={<PrivateRoute />}>
             <Route path="/profile" element={<Profile />} />
             <Route path="/create-listing" element={<CreateListing />} />
+            <Route path="/edit-listing/:listingId" element={<EditListing />} />
           </Route>
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
