@@ -29,3 +29,8 @@ export interface IListingSchema {
   type: ListingType;
   userRef: string;
 }
+
+export interface IListing {
+  id: string;
+  data: IListingSchema;
+}

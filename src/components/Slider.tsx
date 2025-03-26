@@ -5,12 +5,7 @@ import { db } from "../firebase.config";
 import { Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Spinner from "./Spinner";
-import { IListingSchema } from "../shared/firebaseTypes";
-
-interface IListing {
-  id: string;
-  data: IListingSchema;
-}
+import { IListing, IListingSchema } from "../shared/firebaseTypes";
 
 const Slider = () => {
   const [loading, setLoading] = useState(true);

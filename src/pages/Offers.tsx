@@ -6,12 +6,7 @@ import Spinner from "../components/Spinner";
 
 import ListingItem from "../components/ListingItem";
 
-import { IListingSchema } from "../shared/firebaseTypes";
-
-interface IListing {
-  id: string;
-  data: IListingSchema;
-}
+import { IListing, IListingSchema } from "../shared/firebaseTypes";
 
 const Offers = () => {
   const [listings, setListings] = useState<IListing[] | null>(null);

@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { auth, db } from "../firebase.config";
 import { User, updateProfile, updateEmail } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, collection, getDocs, query, where, orderBy, deleteDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import ListingItem from "../components/ListingItem";
 import arrowRight from "../assets/svg/keyboardArrowRightIcon.svg";
 import homeIcon from "../assets/svg/homeIcon.svg";
+
+import { IListing, IListingSchema } from "../shared/firebaseTypes";
 
 interface IPersonalDetails {
   name: string;
@@ -15,6 +18,8 @@ interface IPersonalDetails {
 const Profile = () => {
   const user: User = auth.currentUser!;
   const [changeDetails, setChangeDetails] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+  const [listings, setListings] = useState<IListing[] | null>(null);
   const [formData, setformData] = useState<IPersonalDetails>({
     name: user.displayName!, // we will only be on this page so long as there is a current user
     email: user.email!,
@@ -23,6 +28,24 @@ const Profile = () => {
   const { name, email } = formData;
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserListings = async () => {
+      const listingsRef = collection(db, "listings");
+      const q = query(listingsRef, where("userRef", "==", auth.currentUser!.uid), orderBy("timestamp", "desc"));
+      const querySnap = await getDocs(q);
+      const curListings: IListing[] = [];
+      querySnap.forEach((doc) => {
+        return curListings.push({
+          id: doc.id,
+          data: doc.data() as IListingSchema,
+        });
+      });
+      setListings(curListings);
+      setLoading(false);
+    };
+    fetchUserListings();
+  }, [auth.currentUser?.uid]);
 
   const onLogout = () => {
     auth.signOut();
@@ -63,6 +86,15 @@ const Profile = () => {
     } catch (err: unknown) {
       console.log(err);
       toast.error("Could not update profile details");
+    }
+  };
+
+  const onDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete?")) {
+      await deleteDoc(doc(db, "listings", id));
+      const updatedListings = listings!.filter((listing) => listing.id !== id);
+      setListings(updatedListings);
+      toast.success("Listing deleted");
     }
   };
 
@@ -113,6 +145,22 @@ const Profile = () => {
           <p>Sell or rent your home</p>
           <img src={arrowRight} alt="arrow right" />
         </Link>
+
+        {!loading && listings && listings?.length > 0 && (
+          <>
+            <p className="listingText">Your Listings</p>
+            <ul className="listingsList">
+              {listings.map((listing) => (
+                <ListingItem
+                  key={listing.id}
+                  listing={listing.data}
+                  id={listing.id}
+                  onDelete={() => onDelete(listing.id)}
+                />
+              ))}
+            </ul>
+          </>
+        )}
       </main>
     </div>
   );

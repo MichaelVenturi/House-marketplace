@@ -7,16 +7,11 @@ import Spinner from "../components/Spinner";
 
 import ListingItem from "../components/ListingItem";
 
-import { IListingSchema } from "../shared/firebaseTypes";
+import { IListing, IListingSchema } from "../shared/firebaseTypes";
 
 type CategoryParams = {
   categoryName: string;
 };
-
-interface IListing {
-  id: string;
-  data: IListingSchema;
-}
 
 const Category = () => {
   const [listings, setListings] = useState<IListing[] | null>(null);
