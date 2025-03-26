@@ -44,8 +44,7 @@ const defaultListingData: IFormData = {
 };
 
 const CreateListing = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [geolocationEnabled, setGeolocationEnabled] = useState(true);
+  const geolocationEnabled = true;
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<IFormData>(defaultListingData);
 
